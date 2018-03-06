@@ -1,0 +1,11 @@
+mkdir -p /etc/httpd/nssdb; cd /etc/httpd/nssdb
+# certutil -N -d .
+chown :apache *.db && chmod g+rw *.db
+certutil -A -d . -n 'SIGMA.DSCI IPA CA' -t CT,, -a < /etc/ipa/ca.crt
+ipa-getcert request -d /etc/httpd/nssdb -n Server-Cert-With-San -K host/`hostname` -N `hostname` -D guacamole.idev.sigma.dsci -g 2048
+ ipa-getcert list -i 20170725171518
+certutil -L -d .
+certutil -L -d . -a -n 'Server-Cert-With-San' > server-cert-with-san.crt
+certutil -K -d . -a
+pk12util -o keys.p12 -n 'Server-Cert-With-San' -d .
+openssl pkcs12 -in keys.p12 -out server-cert-with-san.key -nodes
